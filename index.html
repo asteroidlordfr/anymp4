@@ -1,22 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>AI Geometry Dash Level Creator</title>
+  <title>AI Geometry Dash Creator</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>AI Geometry Dash Level Creator</h1>
 
-<textarea id="prompt" placeholder="Describe your level (fast, hard, many spikes, ship section, etc)..."></textarea>
+<textarea id="prompt" placeholder="Fast wave section, hard spikes, ball part..."></textarea>
 
 <button onclick="generateLevel()">Generate Level</button>
 
 <p id="levelName"></p>
+<p id="objectCount"></p>
+
+<canvas id="preview" width="1000" height="200"></canvas>
 
 <button id="exportBtn" onclick="exportGMD()" disabled>Export .gmd</button>
 
 <script src="generator.js"></script>
+<script src="preview.js"></script>
 </body>
 </html>
