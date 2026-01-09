@@ -1,77 +1,75 @@
-let generatedLevel = null;
+let levelString = "";
+let objects = [];
 
 function generateLevel() {
+  objects = [];
+  let x = 30;
+
   const prompt = document.getElementById("prompt").value.toLowerCase();
+  const name = generateName();
 
-  const levelName = generateName(prompt);
-  document.getElementById("levelName").innerText = "Level Name: " + levelName;
+  addStart();
 
-  const objects = generateObjects(prompt);
+  addSection("cube", 10);
+  if (prompt.includes("ship")) addSection("ship", 12);
+  if (prompt.includes("ball")) addSection("ball", 12);
+  if (prompt.includes("ufo")) addSection("ufo", 12);
+  if (prompt.includes("wave")) addSection("wave", 15);
 
-  generatedLevel = buildGMD(levelName, objects);
+  levelString = objects.join("");
+  document.getElementById("levelName").innerText = "Level Name: " + name;
+  document.getElementById("objectCount").innerText = "Objects: " + objects.length;
   document.getElementById("exportBtn").disabled = false;
+
+  renderPreview(objects);
 }
 
-function generateName(prompt) {
-  const words = ["Velocity", "Chaos", "Inferno", "Pulse", "Abyss", "Overdrive"];
-  return words[Math.floor(Math.random() * words.length)] + " AI";
+function generateName() {
+  const names = ["Pulse", "Overdrive", "Neon Rift", "Velocity", "Apex"];
+  return names[Math.floor(Math.random() * names.length)];
 }
 
-function generateObjects(prompt) {
-  let objs = [];
-  let x = 15;
+function addStart() {
+  objects.push("1,31,2,15,3,105;");
+}
 
-  for (let i = 0; i < 80; i++) {
-    // Block
-    objs.push(`1,1,2,${x},3,30;`);
-
-    // Spikes
-    if (prompt.includes("spike") || Math.random() < 0.4) {
-      objs.push(`1,8,2,${x},3,60;`);
-    }
-
-    // Orbs
-    if (prompt.includes("orb") || Math.random() < 0.2) {
-      objs.push(`1,36,2,${x},3,90;`);
-    }
-
-    // Pads
-    if (prompt.includes("pad") || Math.random() < 0.15) {
-      objs.push(`1,35,2,${x},3,30;`);
-    }
-
-    // Speed portals
-    if (prompt.includes("fast") && i === 20) {
-      objs.push(`1,200,2,${x},3,60;`);
-    }
-
-    x += 30;
+function addSection(type, length) {
+  addPortal(type);
+  let y = 90;
+  for (let i = 0; i < length; i++) {
+    objects.push(`1,1,2,${30 + objects.length * 30},3,${y};`);
+    if (Math.random() < 0.5)
+      objects.push(`1,8,2,${30 + objects.length * 30},3,${y + 30};`);
   }
-  return objs.join("");
 }
 
-function buildGMD(name, objectString) {
-  return `<?xml version="1.0"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-<key>kCEK</key>
-<string>${objectString}</string>
-<key>k2</key>
-<string>${name}</string>
-<key>k4</key>
-<integer>1</integer>
-<key>k13</key>
-<integer>0</integer>
-</dict>
-</plist>`;
+function addPortal(type) {
+  const portals = {
+    cube: 12,
+    ship: 13,
+    ball: 47,
+    ufo: 111,
+    wave: 660
+  };
+  objects.push(`1,${portals[type]},2,${30 + objects.length * 30},3,105;`);
 }
 
 function exportGMD() {
-  const blob = new Blob([generatedLevel], { type: "application/xml" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "AI_Level.gmd";
-  link.click();
+  const xml =
+`<?xml version="1.0"?>
+<plist version="1.0">
+<dict>
+<key>kCEK</key>
+<string>${levelString}</string>
+<key>k2</key>
+<string>AI Level</string>
+<key>k4</key><integer>1</integer>
+</dict>
+</plist>`;
+
+  const blob = new Blob([xml], { type: "application/xml" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "AI_Level.gmd";
+  a.click();
 }
