@@ -27,35 +27,48 @@ async function generateLevel() {
 
 async function callGemini(userPrompt) {
   const systemPrompt = `
-Return JSON only.
-Create a Geometry Dash level plan.
-Fields:
-name: string
-sections: array of objects with:
-- type: cube|ship|ball|ufo|wave
-- length: number (5–20)
+Return ONLY valid JSON.
+No markdown.
+No explanation.
+
+{
+  "name": "level name",
+  "sections": [
+    { "type": "cube|ship|ball|ufo|wave", "length": 5-20 }
+  ]
+}
 `;
 
   while (keyIndex < GEMINI_KEYS.length) {
     try {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEYS[keyIndex]}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEYS[keyIndex]}`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({
-            contents: [{
-              parts: [{ text: systemPrompt + "\nUser: " + userPrompt }]
-            }]
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  { text: systemPrompt + "\nPrompt: " + userPrompt }
+                ]
+              }
+            ]
           })
         }
       );
 
-      if (!res.ok) throw new Error("Key failed");
+      if (!res.ok) throw new Error("API failed");
 
       const data = await res.json();
-      return JSON.parse(data.candidates[0].content.parts[0].text);
-    } catch (e) {
+      const text = data.candidates[0].content.parts[0].text;
+
+      return JSON.parse(text);
+    } catch (err) {
+      console.warn("Gemini key failed, rotating...");
       keyIndex++;
     }
   }
