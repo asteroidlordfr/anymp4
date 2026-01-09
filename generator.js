@@ -1,57 +1,100 @@
-let levelString = "";
+const GEMINI_KEYS = [
+  "AIzaSyBlZIS3itLL5cTlPuiCu2U3BWUWxfVKn2o",
+  "AIzaSyDcOQSYC8Xo9xZ8cA-OmTZTK8u5Cnr-2zA",
+  "AIzaSyCuNwLJzlpdOqQ45tN4vioT0Up74Ii_ZBY",
+  "AIzaSyDQWNaY880Gd3guUi3BkvXPLjiVJBWojHU"
+];
+
+let keyIndex = 0;
 let objects = [];
+let levelName = "";
 
-function generateLevel() {
+async function generateLevel() {
   objects = [];
-  let x = 30;
+  let prompt = document.getElementById("prompt").value;
 
-  const prompt = document.getElementById("prompt").value.toLowerCase();
-  const name = generateName();
+  const plan = await callGemini(prompt);
+  levelName = plan.name;
 
-  addStart();
+  buildLevel(plan);
 
-  addSection("cube", 10);
-  if (prompt.includes("ship")) addSection("ship", 12);
-  if (prompt.includes("ball")) addSection("ball", 12);
-  if (prompt.includes("ufo")) addSection("ufo", 12);
-  if (prompt.includes("wave")) addSection("wave", 15);
-
-  levelString = objects.join("");
-  document.getElementById("levelName").innerText = "Level Name: " + name;
+  document.getElementById("levelName").innerText = "Level Name: " + levelName;
   document.getElementById("objectCount").innerText = "Objects: " + objects.length;
   document.getElementById("exportBtn").disabled = false;
 
   renderPreview(objects);
 }
 
-function generateName() {
-  const names = ["Pulse", "Overdrive", "Neon Rift", "Velocity", "Apex"];
-  return names[Math.floor(Math.random() * names.length)];
-}
+async function callGemini(userPrompt) {
+  const systemPrompt = `
+Return JSON only.
+Create a Geometry Dash level plan.
+Fields:
+name: string
+sections: array of objects with:
+- type: cube|ship|ball|ufo|wave
+- length: number (5–20)
+`;
 
-function addStart() {
-  objects.push("1,31,2,15,3,105;");
-}
+  while (keyIndex < GEMINI_KEYS.length) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEYS[keyIndex]}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: systemPrompt + "\nUser: " + userPrompt }]
+            }]
+          })
+        }
+      );
 
-function addSection(type, length) {
-  addPortal(type);
-  let y = 90;
-  for (let i = 0; i < length; i++) {
-    objects.push(`1,1,2,${30 + objects.length * 30},3,${y};`);
-    if (Math.random() < 0.5)
-      objects.push(`1,8,2,${30 + objects.length * 30},3,${y + 30};`);
+      if (!res.ok) throw new Error("Key failed");
+
+      const data = await res.json();
+      return JSON.parse(data.candidates[0].content.parts[0].text);
+    } catch (e) {
+      keyIndex++;
+    }
   }
+
+  throw new Error("All Gemini API keys failed.");
 }
 
-function addPortal(type) {
-  const portals = {
+function buildLevel(plan) {
+  let x = 15;
+
+  addObject(31, x, 105); // start position
+  x += 60;
+
+  plan.sections.forEach(section => {
+    addPortal(section.type, x);
+    x += 45;
+
+    for (let i = 0; i < section.length; i++) {
+      addObject(1, x, 90); // block
+      if (Math.random() < 0.5) addObject(8, x, 120); // spike
+      if (Math.random() < 0.2) addObject(36, x, 150); // orb
+      x += 30;
+    }
+  });
+}
+
+function addPortal(type, x) {
+  const portalIds = {
     cube: 12,
     ship: 13,
     ball: 47,
     ufo: 111,
     wave: 660
   };
-  objects.push(`1,${portals[type]},2,${30 + objects.length * 30},3,105;`);
+  addObject(portalIds[type], x, 105);
+}
+
+function addObject(id, x, y) {
+  objects.push(`1,${id},2,${x},3,${y};`);
 }
 
 function exportGMD() {
@@ -60,9 +103,9 @@ function exportGMD() {
 <plist version="1.0">
 <dict>
 <key>kCEK</key>
-<string>${levelString}</string>
+<string>${objects.join("")}</string>
 <key>k2</key>
-<string>AI Level</string>
+<string>${levelName}</string>
 <key>k4</key><integer>1</integer>
 </dict>
 </plist>`;
@@ -70,6 +113,6 @@ function exportGMD() {
   const blob = new Blob([xml], { type: "application/xml" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "AI_Level.gmd";
+  a.download = levelName.replace(/\s+/g, "_") + ".gmd";
   a.click();
 }
