@@ -5,34 +5,51 @@ const GEMINI_KEYS = [
   "AIzaSyDQWNaY880Gd3guUi3BkvXPLjiVJBWojHU"
 ];
 
-let keyIndex = 0;
 let objects = [];
 let levelName = "";
 
 async function generateLevel() {
   objects = [];
-  let prompt = document.getElementById("prompt").value;
+  let keyIndex = 0; // RESET every generation
+  const prompt = document.getElementById("prompt").value;
 
-  const plan = await callGemini(prompt);
-  levelName = plan.name;
+  let plan;
+  try {
+    plan = await callGemini(prompt, keyIndex);
+  } catch (e) {
+    console.warn("Gemini failed, using fallback level.");
+    plan = {
+      name: "Fallback Level",
+      sections: [
+        { type: "cube", length: 10 },
+        { type: "ship", length: 12 },
+        { type: "ball", length: 10 },
+        { type: "wave", length: 14 }
+      ]
+    };
+  }
+
+  levelName = plan.name || "AI Level";
 
   buildLevel(plan);
 
-  document.getElementById("levelName").innerText = "Level Name: " + levelName;
-  document.getElementById("objectCount").innerText = "Objects: " + objects.length;
+  document.getElementById("levelName").innerText =
+    "Level Name: " + levelName;
+  document.getElementById("objectCount").innerText =
+    "Objects: " + objects.length;
   document.getElementById("exportBtn").disabled = false;
 
   renderPreview(objects);
 }
 
-async function callGemini(userPrompt) {
+async function callGemini(userPrompt, keyIndex) {
   const systemPrompt = `
 Return ONLY valid JSON.
 No markdown.
 No explanation.
 
 {
-  "name": "level name",
+  "name": "Level Name",
   "sections": [
     { "type": "cube|ship|ball|ufo|wave", "length": 5-20 }
   ]
@@ -45,30 +62,28 @@ No explanation.
         `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEYS[keyIndex]}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  { text: systemPrompt + "\nPrompt: " + userPrompt }
-                ]
-              }
-            ]
+            contents: [{
+              role: "user",
+              parts: [{
+                text: systemPrompt + "\nPrompt: " + userPrompt
+              }]
+            }]
           })
         }
       );
 
-      if (!res.ok) throw new Error("API failed");
+      if (!res.ok) throw new Error("HTTP " + res.status);
 
       const data = await res.json();
-      const text = data.candidates[0].content.parts[0].text;
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      console.log("Gemini raw output:", text);
 
       return JSON.parse(text);
     } catch (err) {
-      console.warn("Gemini key failed, rotating...");
+      console.warn("Gemini key failed, rotating:", err.message);
       keyIndex++;
     }
   }
@@ -79,7 +94,8 @@ No explanation.
 function buildLevel(plan) {
   let x = 15;
 
-  addObject(31, x, 105); // start position
+  // Player start
+  addObject(31, x, 105);
   x += 60;
 
   plan.sections.forEach(section => {
@@ -88,8 +104,13 @@ function buildLevel(plan) {
 
     for (let i = 0; i < section.length; i++) {
       addObject(1, x, 90); // block
-      if (Math.random() < 0.5) addObject(8, x, 120); // spike
-      if (Math.random() < 0.2) addObject(36, x, 150); // orb
+
+      if (Math.random() < 0.45)
+        addObject(8, x, 120); // spike
+
+      if (Math.random() < 0.2)
+        addObject(36, x, 150); // orb
+
       x += 30;
     }
   });
@@ -103,7 +124,7 @@ function addPortal(type, x) {
     ufo: 111,
     wave: 660
   };
-  addObject(portalIds[type], x, 105);
+  addObject(portalIds[type] || 12, x, 105);
 }
 
 function addObject(id, x, y) {
