@@ -1,56 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnyMP4 - YouTube Downloader</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>AI Geometry Dash Level Creator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="jaiodjawiudjawdoaj-container">
-        <header>
-            <h1>AnyMP4</h1>
-            <p>YouTube Video & Audio Downloader</p>
-        </header>
 
-        <main>
-            <form id="jaiodjawiudjawdoaj-form">
-                <input 
-                    type="url" 
-                    id="jaiodjawiudjawdoaj-input" 
-                    placeholder="Paste YouTube link here..." 
-                    required
-                    pattern="https?://(www\.)?youtube\.com/watch\?v=.*|https?://youtu\.be/.*"
-                    title="Please enter a valid YouTube link"
-                >
-                <button type="submit" id="jaiodjawiudjawdoaj-submit-btn">Get Download Options</button>
-            </form>
+<h1>AI Geometry Dash Level Creator</h1>
 
-            <div id="jaiodjawiudjawdoaj-loading" class="jaiodjawiudjawdoaj-hidden">
-                <div class="jaiodjawiudjawdoaj-spinner"></div>
-                <p>Unzipping...</p>
-            </div>
+<textarea id="prompt" placeholder="Describe your level (fast, hard, many spikes, ship section, etc)..."></textarea>
 
-            <div id="jaiodjawiudjawdoaj-options" class="jaiodjawiudjawdoaj-hidden">
-                <h3>Choose your download format:</h3>
-                <div class="jaiodjawiudjawdoaj-buttons">
-                    <button id="jaiodjawiudjawdoaj-mp4-btn" data-format="mp4">
-                        <span class="jaiodjawiudjawdoaj-icon">🎬</span>
-                        Download as MP4
-                    </button>
-                    <button id="jaiodjawiudjawdoaj-mp3-btn" data-format="mp3">
-                        <span class="jaiodjawiudjawdoaj-icon">🎵</span>
-                        Download as MP3
-                    </button>
-                </div>
-            </div>
-        </main>
+<button onclick="generateLevel()">Generate Level</button>
 
-        <footer>
-            <p>Please note to not download copyrighted material with this tool</p>
-        </footer>
-    </div>
+<p id="levelName"></p>
 
-    <script src="script.js"></script>
+<button id="exportBtn" onclick="exportGMD()" disabled>Export .gmd</button>
+
+<script src="generator.js"></script>
 </body>
-</html
+</html>
