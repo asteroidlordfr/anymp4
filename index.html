@@ -4,41 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NuggetAnalytics | VR Game Studio</title>
+    <link rel="icon" type="image/x-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlD_WCp3yIYaGSq1_G0gKkZn5Gg-d5_TEPGw&s">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <div class="bg-glow"></div>
 
     <nav class="navbar">
         <div class="logo">Nugget<span>Analytics</span></div>
         <ul class="nav-links">
-            <li><a href="#" class="active">Home</a></li>
+            <li><a href="#" data-section="home" class="nav-item active">Home</a></li>
             <li class="dropdown">
                 <a href="javascript:void(0)" class="dropbtn">Products ▼</a>
                 <div class="dropdown-content">
-                    <a href="#privacy">Gorilla Tags (Privacy Policy)</a>
+                    <a href="#" data-section="privacy">Gorilla Tags (Privacy)</a>
                 </div>
             </li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#" data-section="about" class="nav-item">About</a></li>
         </ul>
     </nav>
 
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Immersive <span class="purple-text">VR Experiences</span></h1>
-            <p>Pushing the boundaries of VR with our products..</p>
-            <button class="cta-btn">Explore Games</button>
-        </div>
-    </header>
+    <div id="content-wrapper">
+        <section id="home" class="page-section active">
+            <header class="hero">
+                <div class="hero-content">
+                    <div class="badge">Next-Gen VR Studio</div>
+                    <h1>Immersive <span class="purple-gradient-text">VR Experiences</span></h1>
+                    <p>We build data-driven virtual worlds that redefine player agency and immersion.</p>
+                    <div class="hero-btns">
+                        <button class="cta-btn primary">Explore Games</button>
+                        <button class="cta-btn secondary">Our Tech</button>
+                    </div>
+                </div>
+            </header>
+        </section>
 
-    <section id="privacy" class="content-section">
-        <h2>Gorilla Tags Privacy Policy</h2>
-        <div class="policy-box">
-            <p></p>
-            <p>At NuggetAnalytics, we value your privacy. This section outlines how we handle data within the Gorilla Tags VR experience...</p>
-        </div>
-    </section>
+        <section id="privacy" class="page-section">
+            <div class="content-container">
+                <h2 class="section-title">Gorilla Tags <span class="purple-gradient-text">Privacy Policy</span></h2>
+                <div class="glass-card">
+                    <p>Effective Date: January 2026</p>
+                    <hr class="divider">
+                    <p>At NuggetAnalytics, we value your privacy. This section outlines how we handle data within the Gorilla Tags VR experience...</p>
+                    </div>
+            </div>
+        </section>
+
+        <section id="about" class="page-section">
+            <div class="content-container">
+                <h2 class="section-title">About <span class="purple-gradient-text">Us</span></h2>
+                <div class="glass-card">
+                    <p>NuggetAnalytics is a premier VR development studio specializing in high-performance analytics and immersive gameplay loops.</p>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <script src="script.js"></script>
 </body>
