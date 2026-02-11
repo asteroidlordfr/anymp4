@@ -1,0 +1,101 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Privacy Policy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+        // === EASY-TO-CHANGE STRINGS ===
+        const PROJECT_NAME = "Nebulon Taggers";
+        const businessEmail = "asteroidbusiness1@gmail.com";
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: #000;
+            color: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .purple-gradient-text {
+            color: #a855f7;
+        }
+
+        .glass-card {
+            max-width: 800px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #444;
+            margin: 20px 0;
+        }
+
+        p {
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+
+    <h2 class="section-title">
+        <span id="projectNameTitle"></span>
+        <span class="purple-gradient-text"> Privacy Policy</span>
+    </h2>
+
+    <div class="glass-card">
+        <p id="policyText"></p>
+    </div>
+
+    <script>
+        document.getElementById("projectNameTitle").textContent = PROJECT_NAME;
+
+        document.getElementById("policyText").textContent = `
+Effective Date: January 2026
+
+This is our Privacy Policy for ${PROJECT_NAME}
+
+Information We Collect:
+PlayFab Data: When utilizing our application, we gather specific data through PlayFab, a third-party service. This includes your country of residence and in-game username.
+
+Use of Collected Information:
+The PlayFab data is utilized to personalize your gaming experience and ensure the smooth operation of our application.
+
+Sharing of Collected Information:
+We do not share PlayFab data with third parties. It is only used for bans and to improve your experience in game.
+
+Data Retention:
+We retain PlayFab data only as long as necessary. You can also request your data to be deleted at our business email.
+
+Security:
+We implement reasonable security measures to protect your data.
+
+User Rights:
+You may request access or deletion of your data by contacting us at any time with ${businessEmail}.
+
+Children's Privacy:
+${PROJECT_NAME} is not intended for children under 13 and we do not knowingly collect data on those below 13. If a parent or guardian contacts our business email notifying of this, we will take the proper steps required to keep them safe.
+
+Updates:
+This policy may be updated periodically. Please make sure to check this.
+
+Contact Us:
+${businessEmail}
+
+©2026 ${PROJECT_NAME}.
+        `;
+    </script>
+
+</body>
+</html>
